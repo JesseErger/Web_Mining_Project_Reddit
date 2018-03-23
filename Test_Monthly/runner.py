@@ -22,7 +22,9 @@ subreddits_of_interest = ['depression', 'ChangeMyView', 'InsightfulQuestions', '
 def start(sub,r,i):
     sub_1 = threading.local() 
     r_1 = threading.local() 
-    i_1 = threading.local() 
+    i_1 = threading.local()
+    end_day_1 = threading.local()
+    end_day_1.i = end_day   
     sub_1.i = sub
     r_1.i = r
     i_1.i = i
@@ -31,7 +33,7 @@ def start(sub,r,i):
       month_1 = threading.local()
       month_1.i = month
       if(month_1.i == 2):
-        end_day = 28
+        end_day_1.i = 28
       start_date = threading.local()
       end_date = threading.local()
       startStamp = threading.local()
@@ -43,7 +45,7 @@ def start(sub,r,i):
       folderName = threading.local()
       try:
         start_date.i = "01"+"/"+str(month_1.i).zfill(2)+"/"+str(year)
-        end_date.i = str(end_day)+"/"+str(month_1.i).zfill(2)+"/"+str(year)
+        end_date.i = str(end_day_1.i)+"/"+str(month_1.i).zfill(2)+"/"+str(year)
         startStamp.i= int(time.mktime(datetime.datetime.strptime(start_date.i, "%d/%m/%Y").timetuple()))
         endStamp.i = int(time.mktime(datetime.datetime.strptime(end_date.i, "%d/%m/%Y").timetuple()))
         sdate.i =datetime.datetime.fromtimestamp(int(startStamp.i)).strftime('%d-%m-%Y')
@@ -51,8 +53,9 @@ def start(sub,r,i):
         progress.i = endStamp.i-startStamp.i
         folderName.i =str(sub_1.i+'_'+str(sdate.i)+'_'+str(edate.i))
       except:
+        end_day_1.i = 30
         start_date.i = "01"+"/"+str(month_1.i).zfill(2)+"/"+str(year)
-        end_date.i = str(30)+"/"+str(month_1.i).zfill(2)+"/"+str(year)
+        end_date.i = str(end_day_1.i)+"/"+str(month_1.i).zfill(2)+"/"+str(year)
         startStamp.i= int(time.mktime(datetime.datetime.strptime(start_date.i, "%d/%m/%Y").timetuple()))
         endStamp.i = int(time.mktime(datetime.datetime.strptime(end_date.i, "%d/%m/%Y").timetuple()))
         sdate.i =datetime.datetime.fromtimestamp(int(startStamp.i)).strftime('%d-%m-%Y')
