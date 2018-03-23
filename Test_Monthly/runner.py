@@ -27,8 +27,11 @@ def start(sub,r,i):
     r_1.i = r
     i_1.i = i
     for month in range(1,13):
+      
       month_1 = threading.local()
       month_1.i = month
+      if(month_1.i == 2):
+        end_day = 28
       start_date = threading.local()
       end_date = threading.local()
       startStamp = threading.local()
@@ -38,15 +41,24 @@ def start(sub,r,i):
       client_secret = threading.local()
       progress = threading.local()
       folderName = threading.local()
-      
-      start_date.i = "01"+"/"+str(month_1.i).zfill(2)+"/"+str(year)
-      end_date.i = str(end_day)+"/"+str(month_1.i).zfill(2)+"/"+str(year)
-      startStamp.i= int(time.mktime(datetime.datetime.strptime(start_date.i, "%d/%m/%Y").timetuple()))
-      endStamp.i = int(time.mktime(datetime.datetime.strptime(end_date.i, "%d/%m/%Y").timetuple()))
-      sdate.i =datetime.datetime.fromtimestamp(int(startStamp.i)).strftime('%d-%m-%Y')
-      edate.i =datetime.datetime.fromtimestamp(int(endStamp.i)).strftime('%d-%m-%Y')
-      progress.i = endStamp.i-startStamp.i
-      folderName.i =str(sub_1.i+'_'+str(sdate.i)+'_'+str(edate.i))
+      try:
+        start_date.i = "01"+"/"+str(month_1.i).zfill(2)+"/"+str(year)
+        end_date.i = str(end_day)+"/"+str(month_1.i).zfill(2)+"/"+str(year)
+        startStamp.i= int(time.mktime(datetime.datetime.strptime(start_date.i, "%d/%m/%Y").timetuple()))
+        endStamp.i = int(time.mktime(datetime.datetime.strptime(end_date.i, "%d/%m/%Y").timetuple()))
+        sdate.i =datetime.datetime.fromtimestamp(int(startStamp.i)).strftime('%d-%m-%Y')
+        edate.i =datetime.datetime.fromtimestamp(int(endStamp.i)).strftime('%d-%m-%Y')
+        progress.i = endStamp.i-startStamp.i
+        folderName.i =str(sub_1.i+'_'+str(sdate.i)+'_'+str(edate.i))
+      except:
+        start_date.i = "01"+"/"+str(month_1.i).zfill(2)+"/"+str(year)
+        end_date.i = str(30)+"/"+str(month_1.i).zfill(2)+"/"+str(year)
+        startStamp.i= int(time.mktime(datetime.datetime.strptime(start_date.i, "%d/%m/%Y").timetuple()))
+        endStamp.i = int(time.mktime(datetime.datetime.strptime(end_date.i, "%d/%m/%Y").timetuple()))
+        sdate.i =datetime.datetime.fromtimestamp(int(startStamp.i)).strftime('%d-%m-%Y')
+        edate.i =datetime.datetime.fromtimestamp(int(endStamp.i)).strftime('%d-%m-%Y')
+        progress.i = endStamp.i-startStamp.i
+        folderName.i =str(sub_1.i+'_'+str(sdate.i)+'_'+str(edate.i))
       if not os.path.exists(folderName.i):
         os.makedirs(folderName.i)
       json_extract.main(startStamp.i,endStamp.i,step,folderName.i,sub_1.i,progress.i,r_1.i,i_1.i)
