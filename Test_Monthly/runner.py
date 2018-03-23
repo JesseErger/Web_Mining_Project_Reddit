@@ -34,6 +34,8 @@ def start(sub,r,i):
       month_1.i = month
       if(month_1.i == 2):
         end_day_1.i = 28
+      else:
+        end_day_1.i = 31
       start_date = threading.local()
       end_date = threading.local()
       startStamp = threading.local()
