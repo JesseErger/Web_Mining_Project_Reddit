@@ -20,7 +20,7 @@ month_range = [1,12] #Inclusive
 b = "timestamp:"
 d = ".."
 
-subreddits_of_interest = ['depression', 'ChangeMyView', 'InsightfulQuestions', 'SRSDiscussion', 'SuicideWatch', 'PTSD', 'humor', 'funny', 'ProgrammerHumor'] 
+subreddits_of_interest = ['depression', 'ChangeMyView']# 'InsightfulQuestions', 'SRSDiscussion', 'SuicideWatch', 'PTSD', 'humor', 'funny', 'ProgrammerHumor'] 
 
 #(Could add more/ different reddit user apps as it may run faster)
 app_secrets = [ "U11Lejz0vUGwskUj17NHRB0y6Mo" , "jokvG1pEvFYbrs0cEfHuwbjqpco", "pNPbUrPn8mq537vXOBa5D-dQ1JY", "bLASZva09euXiNFVqjlnMRKjZnw", "TlaIxjZK6L0bX-U6zSZanAvYguI" , "K12FC8IJ3xF7SACyo-A0CUXR2nQ", "dGWuaPfKaUQp-wgv7jDV2Nu0p84" ,"seAe1eGqTDSfjxtA_7lxeROWzic", "8ueVFhNN2P-Irg2diYsQ8awxHOs"]
@@ -82,15 +82,14 @@ def start_threadin(sub,r,my_id):
     if((start_months_target_month_year[sub_1.i][0] <= start_months_target_month_year[sub_1.i][1])):
       month_1.i = start_months_target_month_year[sub_1.i][0]
       year.i = start_months_target_month_year[sub_1.i][2]
-      start_months_target_month_year[sub_1.i][0] += 1
-      #were at the last year and want the thread to take month 12
-      if(start_months_target_month_year[sub_1.i][2]+1 == start_months_target_month_year[sub_1.i][3]):
+      if(not start_months_target_month_year[sub_1.i][0] == month_range[1]):
+        start_months_target_month_year[sub_1.i][0] += 1
+      #were switching years and at the last month, we want to take it and update to the next year
+      elif( (start_months_target_month_year[sub_1.i][2]+1 < start_months_target_month_year[sub_1.i][3]) and start_months_target_month_year[sub_1.i][0] == month_range[1]):
         month_1.i = start_months_target_month_year[sub_1.i][0]
-    elif(start_months_target_month_year[sub_1.i][2] < start_months_target_month_year[sub_1.i][3]):
-      start_months_target_month_year[sub_1.i][2] += 1
-      start_months_target_month_year[sub_1.i][0] = month_range[0]
-      month_1.i = start_months_target_month_year[sub_1.i][0]
-      year.i = start_months_target_month_year[sub_1.i][2] 
+        #reset for the next year
+        start_months_target_month_year[sub_1.i][0] = month_range[0]
+        start_months_target_month_year[sub_1.i][2] += 1
     Lock.release()   
     
     start_date = threading.local()
