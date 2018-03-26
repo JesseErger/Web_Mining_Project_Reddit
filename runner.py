@@ -15,12 +15,12 @@ import threading
 
 #**********************_____________________________________________TUNEABLE PARAMETERS_____________________________________________**************************
 
-year_range = [2015,2018] #Left inclusive right exclusive.
+year_range = [2017,2018] #Left inclusive right exclusive.
 month_range = [1,12] #Inclusive
 b = "timestamp:"
 d = ".."
-
-subreddits_of_interest = ['depression', 'ChangeMyView']# 'InsightfulQuestions', 'SRSDiscussion', 'SuicideWatch', 'PTSD', 'humor', 'funny', 'ProgrammerHumor'] 
+subreddits_of_interest = ['depression', 'ChangeMyView', 'InsightfulQuestions', 'SRSDiscussion', 'SuicideWatch', 'PTSD', 'humor', 'funny', 'ProgrammerHumor'] 
+#subreddits_of_interest = ['depression', 'ChangeMyView', 'InsightfulQuestions', 'SRSDiscussion', 'SuicideWatch', 'PTSD', 'humor', 'funny', 'ProgrammerHumor'] # 'InsightfulQuestions', 'SRSDiscussion', 'SuicideWatch', 'PTSD', 'humor', 'funny', 'ProgrammerHumor'] 
 
 #(Could add more/ different reddit user apps as it may run faster)
 app_secrets = [ "U11Lejz0vUGwskUj17NHRB0y6Mo" , "jokvG1pEvFYbrs0cEfHuwbjqpco", "pNPbUrPn8mq537vXOBa5D-dQ1JY", "bLASZva09euXiNFVqjlnMRKjZnw", "TlaIxjZK6L0bX-U6zSZanAvYguI" , "K12FC8IJ3xF7SACyo-A0CUXR2nQ", "dGWuaPfKaUQp-wgv7jDV2Nu0p84" ,"seAe1eGqTDSfjxtA_7lxeROWzic", "8ueVFhNN2P-Irg2diYsQ8awxHOs"]
@@ -133,29 +133,43 @@ def start_threadin(sub,r,my_id):
         g = threading.local()
         f.i = str(currentStamp)
         g.i = str(currentStamp+step)
-        search_results =threading.local()
-        search_results.i = r_1.i.subreddit(sub_1.i).search(b+f.i+d+g.i, syntax='cloudsearch')
+        search_results = threading.local()
+        search_success = threading.local()
+        search_success.i = True
+        try:
+          search_results.i = r_1.i.subreddit(sub_1.i).search(b+f.i+d+g.i, syntax='cloudsearch')
+        except:
+          print("Failed to get search results from reddit\n")
+          search_success.i = False
+          continue
         count+=step
-        for post in search_results.i:
-          try:
-        
-            url = threading.local()
-            url.i = "https://reddit.com" + (post.permalink).replace('?ref=search_posts','')
-            data= {'user-agent':'archive by /u/healdb'}
-            response = threading.local()
-            response.i = requests.get(url.i+'.json',headers=data)
-            filename = threading.local()
-            filename.i=folderName.i+"/"+post.name+'.json'
-            print("File created @ "+filename.i)
-            obj_d = threading.local()
-            obj_d=open(filename.i, 'w')
-            obj_d.write(response.i.text)
-            obj_d.close()
-            time.sleep(1)
-          except:
-            continue
+        if(search_success.i):
+          for post in search_results.i:
+            response_success = threading.local()
+            response_success.i = True
+            try:       
+              url = threading.local()
+              url.i = "https://reddit.com" + (post.permalink).replace('?ref=search_posts','')
+              data= {'user-agent':'archive by /u/healdb'}
+              response = threading.local()
+              try:
+                response.i = requests.get(url.i+'.json',headers=data, timeout = 60)
+              except:
+                print("Failed to get a web response\n")
+                response_success.i  = False
+                continue
+              if(response_success.i):
+                filename = threading.local()
+                filename.i=folderName.i+"/"+post.name+'.json'
+                print("File created @ "+filename.i)
+                obj_d = threading.local()
+                obj_d=open(filename.i, 'w')
+                obj_d.write(response.i.text)
+                obj_d.close()
+                time.sleep(max(1,int(threading.active_count()/4)))
+            except:
+              continue
         c.i+=1
-        #print('Welp, all done here! Stopped at timestamp '+ str(currentStamp))
     filename_f = threading.local()
     filename_f.i= str(folderName.i)+"/"+"___Finished"+'.txt'
     obj_d = threading.local()
@@ -189,10 +203,5 @@ for subs in subreddits_of_interest:
     t = Thread(target=start_threadin, args=(sub.i,r.i,my_id.i))
     threads_arr.append(t)
     t.start()
-print(len(threads_arr))
-
-
-
-
-
-
+time.sleep(1)
+print("Using "+str(threading.active_count()-1)+ " Threads")
