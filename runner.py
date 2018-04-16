@@ -1,5 +1,4 @@
 #Author Jesse Erger
-import json_extract
 # -*- coding: utf-8 -*-
 import time
 import datetime
@@ -12,17 +11,14 @@ d = ".."
 from threading import Thread, RLock
 import threading
 
-#['depression', 'ChangeMyView', 'InsightfulQuestions', 'SRSDiscussion', 'SuicideWatch', 'PTSD', 'humor', 'funny', 'ProgrammerHumor'] 
 
 #**********************_____________________________________________TUNEABLE PARAMETERS_____________________________________________**************************
 
-year_range = [2014,2015] #Left inclusive right exclusive.
+year_range = [2012,2013] #Left inclusive right exclusive.
 month_range = [1,12] #Inclusive
-max_threads = 100
 b = "timestamp:"
 d = ".."
-
-subreddits_of_interest = ['depression', 'ChangeMyView', 'InsightfulQuestions', 'SRSDiscussion', 'SuicideWatch', 'PTSD', 'humor', 'funny', 'ProgrammerHumor'] #['PTSD', 'InsightfulQuestions', 'ChangeMyView']
+subreddits_of_interest = ['depression', 'ChangeMyView', 'InsightfulQuestions', 'SRSDiscussion', 'SuicideWatch', 'PTSD', 'humor', 'funny', 'ProgrammerHumor'] 
 
 #(Could add more/ different reddit user apps as it may run faster)
 app_secrets = [ "U11Lejz0vUGwskUj17NHRB0y6Mo" , "jokvG1pEvFYbrs0cEfHuwbjqpco", "pNPbUrPn8mq537vXOBa5D-dQ1JY", "bLASZva09euXiNFVqjlnMRKjZnw", "TlaIxjZK6L0bX-U6zSZanAvYguI" , "K12FC8IJ3xF7SACyo-A0CUXR2nQ", "dGWuaPfKaUQp-wgv7jDV2Nu0p84" ,"seAe1eGqTDSfjxtA_7lxeROWzic", "8ueVFhNN2P-Irg2diYsQ8awxHOs"]
@@ -64,8 +60,9 @@ num_days_in_month={
 
 threads_arr = []
 step=350   
+Lock = threading.Lock()
 def start_threadin(sub,r,my_id):
-    
+    print(str(threading.get_ident()) + "_" +sub)
     idd = threading.local()
     sub_1 = threading.local()
     sub_1.i = sub
@@ -74,103 +71,90 @@ def start_threadin(sub,r,my_id):
     client_secret = threading.local()
     r_1 = threading.local() 
     r_1.i = r
-    while(True):
-        Lock = threading.RLock(blocking=1)
-        Lock.acquire()
-        month_1 = threading.local()
+    month_1 = threading.local()
+    year = threading.local()
+    
+    Lock.acquire()
+    if((start_months_target_month_year[sub_1.i][0] <= start_months_target_month_year[sub_1.i][1])):
+      month_1.i = start_months_target_month_year[sub_1.i][0]
+      year.i = start_months_target_month_year[sub_1.i][2]
+      if(not start_months_target_month_year[sub_1.i][0] == month_range[1]):
+        start_months_target_month_year[sub_1.i][0] += 1
+      #were switching years and at the last month, we want to take it and update to the next year
+      elif( (start_months_target_month_year[sub_1.i][2]+1 < start_months_target_month_year[sub_1.i][3]) and start_months_target_month_year[sub_1.i][0] == month_range[1]):
         month_1.i = start_months_target_month_year[sub_1.i][0]
-        new_month = False
-        new_sub = False
-        new_year = False
-        #Get next month for same sub reddit
-        if((start_months_target_month_year[sub_1.i][0] < start_months_target_month_year[sub_1.i][1])):
-          month_1.i = start_months_target_month_year[sub_1.i][0]
-          start_months_target_month_year[sub_1.i][0] += 1
-          new_month = True 
-          Lock.release()
-          break
-        #check if other subs need help with their months
-        elif(not new_month):        
-          for sub in subreddits_of_interest: 
-            if((start_months_target_month_year[sub][0] < start_months_target_month_year[sub][1])):
-              sub_1.i = sub
-              month_1.i = start_months_target_month_year[sub_1.i][0] 
-              start_months_target_month_year[sub_1.i][0] += 1
-              new_sub = True
-              Lock.release()
-              break
-        #if no help is needed on the other subs, see if there is a year range and update the year for this sub reddit
-        elif( (start_months_target_month_year[3] != start_months_target_month_year[4]+1) and not new_month and not new_sub):
-          #update the sub information in the start_months_target_month_year discretionary.
-          start_months_target_month_year[sub_1.i][0] = month_range[0]
-          start_months_target_month_year[sub_1.i][1] = month_range[1]
-          start_months_target_month_year[sub_1.i][2] += 1
-          new_year = True
-          Lock.release()
-        else:
-          Lock.release()
-          threads.remove(t)
-          try:
-            t.exit()
-          except:
-            print("Killed thread")         
-          
-        year = threading.local()
-        year.i = start_months_target_month_year[sub_1.i][2]
-        start_date = threading.local()
-        end_date = threading.local()
-        startStamp = threading.local()
-        endStamp = threading.local()
-        sdate = threading.local() 
-        edate = threading.local()
-        client_secret = threading.local()
-        progress = threading.local()
-        folderName = threading.local()
-        folderName.i = ""
-        end_date.i = num_days_in_month[str(month_1.i)][1]
-        start_date.i =str(num_days_in_month[str(month_1.i)][0])+"/"+str(month_1.i).zfill(2)+"/"+str(year.i)
-        end_date.i = str(num_days_in_month[str(month_1.i)][1])+"/"+str(month_1.i).zfill(2)+"/"+str(year.i)
-        startStamp.i= int(time.mktime(datetime.datetime.strptime(start_date.i, "%d/%m/%Y").timetuple()))
-        endStamp.i = int(time.mktime(datetime.datetime.strptime(end_date.i, "%d/%m/%Y").timetuple()))
-        try:  
-          sdate.i =datetime.datetime.fromtimestamp(int(startStamp.i)).strftime('%d-%m-%Y')
-          edate.i =datetime.datetime.fromtimestamp(int(endStamp.i)).strftime('%d-%m-%Y')
-          progress.i = endStamp.i-startStamp.i
-        except Exception as e:
-          print(e)
-        try:       
-          folderName.i = str(str(year.i)+'/'+sub_1.i+ '/' +sub_1.i+ '_'+str(sdate.i)+'_'+str(edate.i))
-        except Exception as e:
-          print(e)
-          break
-          continue
-        try:       
-          if not os.path.exists(folderName.i):
-            os.makedirs(folderName.i)
+        #reset for the next year
+        start_months_target_month_year[sub_1.i][0] = month_range[0]
+        start_months_target_month_year[sub_1.i][2] += 1
+    Lock.release()   
+    
+    start_date = threading.local()
+    end_date = threading.local()
+    startStamp = threading.local()
+    endStamp = threading.local()
+    sdate = threading.local() 
+    edate = threading.local()
+    client_secret = threading.local()
+    progress = threading.local()
+    folderName = threading.local()
+    folderName.i = ""
+    end_date.i = num_days_in_month[str(month_1.i)][1]
+    start_date.i =str(num_days_in_month[str(month_1.i)][0])+"/"+str(month_1.i).zfill(2)+"/"+str(year.i)
+    end_date.i = str(num_days_in_month[str(month_1.i)][1])+"/"+str(month_1.i).zfill(2)+"/"+str(year.i)
+    startStamp.i= int(time.mktime(datetime.datetime.strptime(start_date.i, "%d/%m/%Y").timetuple()))
+    endStamp.i = int(time.mktime(datetime.datetime.strptime(end_date.i, "%d/%m/%Y").timetuple()))
+    try:  
+      sdate.i =datetime.datetime.fromtimestamp(int(startStamp.i)).strftime('%d-%m-%Y')
+      edate.i =datetime.datetime.fromtimestamp(int(endStamp.i)).strftime('%d-%m-%Y')
+      progress.i = endStamp.i-startStamp.i
+    except Exception as e:
+      print(e)
+    try:       
+      folderName.i = str(str(year.i)+'/'+sub_1.i+ '/' +sub_1.i+ '_'+str(sdate.i)+'_'+str(edate.i))
+    except Exception as e:
+      pass
+    try:       
+      if not os.path.exists(folderName.i):
+        os.makedirs(folderName.i)
+    except:
+       pass
+    count = step
+    c = threading.local()
+    c.i = 1
+    for currentStamp in range(startStamp.i,endStamp.i,step):
+        e=' --'
+        if(c.i%2==0):
+            e=' |'
+        f = threading.local()
+        g = threading.local()
+        f.i = str(currentStamp)
+        g.i = str(currentStamp+step)
+        search_results = threading.local()
+        search_success = threading.local()
+        search_success.i = True
+        try:
+          search_results.i = r_1.i.subreddit(sub_1.i).search(b+f.i+d+g.i, syntax='cloudsearch')
         except:
-           continue
-        count = step
-        c = threading.local()
-        c.i = 1
-        for currentStamp in range(startStamp.i,endStamp.i,step):
-            e=' --'
-            if(c.i%2==0):
-                e=' |'
-            f = threading.local()
-            g = threading.local()
-            f.i = str(currentStamp)
-            g.i = str(currentStamp+step)
-            search_results =threading.local()
-            search_results.i = r_1.i.subreddit(sub_1.i).search(b+f.i+d+g.i, syntax='cloudsearch')
-            count+=step
-            for post in search_results.i:
+          print("Failed to get search results from reddit\n")
+          search_success.i = False
+          continue
+        count+=step
+        if(search_success.i):
+          for post in search_results.i:
+            response_success = threading.local()
+            response_success.i = True
+            try:       
+              url = threading.local()
+              url.i = "https://reddit.com" + (post.permalink).replace('?ref=search_posts','')
+              data= {'user-agent':'archive by /u/healdb'}
+              response = threading.local()
               try:
-            
-                url = threading.local()
-                url.i = "https://reddit.com" + (post.permalink).replace('?ref=search_posts','')
-                data= {'user-agent':'archive by /u/healdb'}
-                response = threading.local()
-                response.i = requests.get(url.i+'.json',headers=data)
+                response.i = requests.get(url.i+'.json',headers=data, timeout = 60)
+              except:
+                print("Failed to get a web response\n")
+                response_success.i  = False
+                continue
+              if(response_success.i):
                 filename = threading.local()
                 filename.i=folderName.i+"/"+post.name+'.json'
                 print("File created @ "+filename.i)
@@ -178,17 +162,16 @@ def start_threadin(sub,r,my_id):
                 obj_d=open(filename.i, 'w')
                 obj_d.write(response.i.text)
                 obj_d.close()
-                time.sleep(1)
-              except:
-                continue
-            c.i+=1
-        #print('Welp, all done here! Stopped at timestamp '+ str(currentStamp))
-        filename_f = threading.local()
-        filename_f.i= str(folderName.i)+"/"+"___Finished"+'.txt'
-        obj_d = threading.local()
-        obj_d.i=open(filename_f.i, 'w')
-        obj_d.i.write("DONE")
-        obj_d.i.close()
+                time.sleep(max(1,int(threading.active_count()/4)))
+            except:
+              continue
+        c.i+=1
+    filename_f = threading.local()
+    filename_f.i= str(folderName.i)+"/"+"___Finished"+'.txt'
+    obj_d = threading.local()
+    obj_d.i=open(filename_f.i, 'w')
+    obj_d.i.write("DONE")
+    obj_d.i.close()
 num_months_sub = {}
 num_months = 0
 
@@ -216,7 +199,8 @@ for subs in subreddits_of_interest:
     t = Thread(target=start_threadin, args=(sub.i,r.i,my_id.i))
     threads_arr.append(t)
     t.start()
-print(len(threads_arr))
+time.sleep(1)
+print("Using "+str(threading.active_count()-1)+ " Threads")
 
 
 
