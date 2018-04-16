@@ -77,6 +77,7 @@ def processRedditJsonFile(filename):
     data = []
     f = open(filename)
     for line in f:
+        line = line.strip('n')
         data.append(json.loads(line))
 
     # The forloops only run once usually/ when there is only one line
@@ -93,13 +94,16 @@ def processRedditJsonFile(filename):
         lst.append(postObj)
     return lst
 
-def RedditJsonFilesToCSV(filenames, newname):
+def RedditJsonFilesToCSV(filenames, newname, new_dir):
     table =[]
     for filename in filenames :
-        lst = processRedditJsonFile(filename)
-        jsonObject = lst[0]
-        JsonToTable(jsonObject,table)
-    with open(newname, 'w') as csvfile:
+        try:
+            lst = processRedditJsonFile(filename)
+            jsonObject = lst[0]
+            JsonToTable(jsonObject,table)
+        except:
+            print("Error processing file -> " + filename)
+    with open(new_dir+"\\"+newname, 'w') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['poster','respondingTo','ups','downs'])
         [writer.writerow(r) for r in table]
@@ -111,7 +115,6 @@ def JsonToTable(jsonObject,table):
                         jsonObject['ups'],jsonObject['downs']])
             JsonToTable(child,table)
 
-
 def GetFiles():
     changeMyViews = []
     depression = []
@@ -121,34 +124,45 @@ def GetFiles():
     funny = []
     humor = []
     ptsd = []
-    directory = sys.argv[1]
-    for root, dirs, files in os.walk(directory):
-        for name in files :
-            if name.endswith('json'):
-                if ('ChangeMyView' in root):
-                    changeMyViews.append(os.path.join(root, name))
-                if ('depression' in root):
-                    depression.append(os.path.join(root, name))
-                if ('funny' in root):
-                    funny.append(os.path.join(root, name))
-                if ('InsightfulQuestions' in root):
-                    insightfulQuestion.append(os.path.join(root, name))
-                if ('SuicideWatch' in root):
-                    suicideWatch.append(os.path.join(root, name))
-                if ('humor' in root):
-                    humor.append(os.path.join(root, name))
-                if ('PTSD' in root):
-                    ptsd.append(os.path.join(root, name))
-                if ('ProgrammerHumor' in root):
-                    programmerHumor.append(os.path.join(root, name))
-    RedditJsonFilesToCSV(changeMyViews, "ChangeMyView.csv")
-    RedditJsonFilesToCSV(depression, "depression.csv")
-    RedditJsonFilesToCSV(insightfulQuestion, "insightfulQuestion.csv")
-    RedditJsonFilesToCSV(programmerHumor, "programmerHumor.csv")
-    RedditJsonFilesToCSV(suicideWatch, "suicideWatch.csv")
-    RedditJsonFilesToCSV(funny, "funny.csv")
-    RedditJsonFilesToCSV(ptsd, "ptsd.csv")
-    RedditJsonFilesToCSV(humor, "humor.csv")
+    SRSDiscussion = []
+    for year in range(2013,2019):
+        directory = sys.argv[1] + str(year)
+        new_dir = sys.argv[1] + str(year) +"_processed"
+        try:
+            os.mkdir(new_dir)
+        except:
+            pass#dir already exsits
+        for root, dirs, files in os.walk(directory):
+            for name in files :
+                if name.endswith('json'):
+                    if ('ChangeMyView' in root):
+                        changeMyViews.append(os.path.join(root, name))
+                    if ('depression' in root):
+                        depression.append(os.path.join(root, name))
+                    if ('funny' in root):
+                        funny.append(os.path.join(root, name))
+                    if ('InsightfulQuestions' in root):
+                        insightfulQuestion.append(os.path.join(root, name))
+                    if ('SuicideWatch' in root):
+                        suicideWatch.append(os.path.join(root, name))
+                    if ('humor' in root):
+                        humor.append(os.path.join(root, name))
+                    if ('PTSD' in root):
+                        ptsd.append(os.path.join(root, name))
+                    if ('ProgrammerHumor' in root):
+                        programmerHumor.append(os.path.join(root, name))
+                    if ('SRSDiscussion' in root):
+                        SRSDiscussion.append(os.path.join(root, name))
+        RedditJsonFilesToCSV(SRSDiscussion, "SRSDiscussion"+"_"+str(year)+".csv",new_dir)
+        RedditJsonFilesToCSV(changeMyViews, "ChangeMyView"+"_"+str(year)+".csv",new_dir)
+        RedditJsonFilesToCSV(SRSDiscussion, "SRSDiscussion"+"_"+str(year)+".csv",new_dir)
+        RedditJsonFilesToCSV(depression, "depression"+"_"+str(year)+".csv",new_dir)
+        RedditJsonFilesToCSV(insightfulQuestion, "insightfulQuestion"+"_"+str(year)+".csv",new_dir)
+        RedditJsonFilesToCSV(programmerHumor, "programmerHumor"+"_"+str(year)+".csv",new_dir)
+        RedditJsonFilesToCSV(suicideWatch, "suicideWatch"+"_"+str(year)+".csv",new_dir)
+        RedditJsonFilesToCSV(funny, "funny"+"_"+str(year)+".csv",new_dir)
+        RedditJsonFilesToCSV(ptsd, "ptsd"+"_"+str(year)+".csv",new_dir)
+        RedditJsonFilesToCSV(humor, "humor"+"_"+str(year)+".csv",new_dir)
 
 
 GetFiles()
