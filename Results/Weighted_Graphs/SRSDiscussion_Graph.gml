@@ -1,7 +1,7 @@
-Creator "Jesse Erger
+Creator "Jesse Erger"
 graph
 [
-  directed True
+  directed 1
   node
   [
     id williammc
@@ -123261,3 +123261,4 @@ graph
     target Thaboranoc
     value 1
   ]
+]

@@ -1,7 +1,7 @@
-Creator "Jesse Erger
+Creator "Jesse Erger"
 graph
 [
-  directed True
+  directed 1
   node
   [
     id AnnieSchueler
@@ -230493,3 +230493,4 @@ graph
     target SlapstickVampire
     value 2
   ]
+]

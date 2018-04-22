@@ -2,9 +2,6 @@ import os
 import csv
 
 #Author Jesse Erger
-#Creates random graphs in Gephi format with a set edge probability between two nodes (prob_of_edge). Adjust the tunable parameters to your desired parameters. 
-#Graph files will be created in the directory this is ran. To run, simply open a command prompt and navigate to the directory of this file. 
-#Run the command python create_graph.py. Expect a run time of O(num_nodes^2*num_graphs). Feel free to write various stats about each graph with the stats_fp.write("") command.
 from random import *
 def create_nodes(node_name, reddit_label, file):
     file.write("  node\n  [\n    id "+str(node_name)+"\n    label \""+str(reddit_label)+"\"\n  ]\n")
@@ -50,7 +47,7 @@ for sub_reddit in subreddit_dict.keys():
                     active_posters_dict[sub_reddit][post[0]][post[1]] = ([post[1],1])
 for subreddit in active_posters_dict.keys():
     processed_out = open(subreddit+"_Graph"+".gml",'w')
-    processed_out.write("Creator \"Jesse Erger\ngraph\n[\n  directed "+str(directed)+"\n")
+    processed_out.write("Creator \"Jesse Erger\"\ngraph\n[\n  directed "+str(int(directed))+"\n")
     for replyer in active_posters_dict[subreddit]:
         create_nodes(str(replyer),subreddit,processed_out)
     for replyer in active_posters_dict[subreddit]:
@@ -61,8 +58,8 @@ for subreddit in active_posters_dict.keys():
             #print(active_posters_dict[subreddit][replyer][reply])
         #print(str(replyer) + " -> " +str(active_posters_dict[subreddit][replyer]))
         #processed_out.write(str(replyer) + " -> " +str(active_posters_dict[subreddit][replyer])+'\n\n\n')
-processed_out.write("]") 
-processed_out.close()
+    processed_out.write("]")
+    processed_out.close()
 '''
 for subreddit in active_posters_dict.keys():
     processed_out = open(subreddit+"_User_NumPosts_AvgUpvote.csv",'w')

@@ -1,7 +1,7 @@
-Creator "Jesse Erger
+Creator "Jesse Erger"
 graph
 [
-  directed True
+  directed 1
   node
   [
     id Antabaka
@@ -170878,3 +170878,4 @@ graph
     target willesuger
     value 1
   ]
+]
